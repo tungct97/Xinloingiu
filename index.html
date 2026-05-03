@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lời Xin Lỗi Chân Thành</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        #overlay {
+            position: relative;
+            z-index: 10;
+        }
+        button {
+            padding: 15px 40px;
+            font-size: 20px;
+            cursor: pointer;
+            background: linear-gradient(45deg, #ff00cc, #3333ff);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 0 20px rgba(255, 0, 204, 0.6);
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 0, 204, 0.9);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="overlay">
+        <button onclick="startEverything()">Mở hộp thư của Anh ❤️</button>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <audio id="myAudio" loop>
+        <source src="https://www.bensound.com/bensound-music/bensound-love.mp3" type="audio/mpeg">
+    </audio>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const audio = document.getElementById('myAudio');
+    const overlay = document.getElementById('overlay');
+
+    let animationStarted = false;
+
+    function startEverything() {
+        overlay.style.display = 'none';
+        audio.play();
+        animationStarted = true;
+        init();
+        animate();
+    }
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const messages = ["Anh xin lỗi", "Tha thứ cho anh nhé", "❤️", "Đừng giận anh nữa", "Yêu em nhiều", "Xin lỗi mà..."];
+    
+    // Bảng màu lấy cảm hứng trực tiếp từ ảnh gốc (Hồng, Tím, Trắng mờ, Cam nhạt)
+    const colors = ["#ff00ff", "#e0aaff", "#ffc8dd", "#ffffff", "#ff4d6d", "#c77dff", "#ffafcc"];
+
+    const particles = [];
+
+    class Particle {
+        constructor() {
+            this.reset();
+        }
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.text = messages[Math.floor(Math.random() * messages.length)];
+            
+            // Màu sắc ngẫu nhiên trong tông hồng/tím/trắng của ảnh
+            this.color = this.text === "❤️" ? "#ff0000" : colors[Math.floor(Math.random() * colors.length)];
+            
+            this.size = Math.floor(Math.random() * 12 + 18);
+            // Bay chậm và lơ lửng như trong video
+            this.speedX = Math.random() * 0.4 - 0.2;
+            this.speedY = Math.random() * -0.6 - 0.1; // Xu hướng bay lên nhẹ
+            this.opacity = Math.random() * 0.5 + 0.5;
+        }
+        draw() {
+            ctx.globalAlpha = this.opacity;
+            ctx.fillStyle = this.color;
+            ctx.font = `bold ${this.size}px Arial`;
+            ctx.fillText(this.text, this.x, this.y);
+            ctx.globalAlpha = 1;
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.y < -50) this.y = canvas.height + 50;
+            if (this.x < -150) this.x = canvas.width;
+            if (this.x > canvas.width + 150) this.x = -150;
+        }
+    }
+
+    function init() {
+        for (let i = 0; i < 70; i++) {
+            particles.push(new Particle());
+        }
+    }
+
+    function animate() {
+        if (!animationStarted) return;
+        // Tạo hiệu ứng mờ nền nhẹ để chữ nhìn sâu hơn
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+        requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+</script>
+</body>
+</html>
